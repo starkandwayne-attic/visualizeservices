@@ -11,7 +11,8 @@ RUN cd /tmp; unzip consul-0.4.0_linux_amd64.zip; mv consul /bin/
 ADD blobs/docker-1.2.0 /bin/docker
 RUN chmod +x /bin/docker
 
+ADD scripts /scripts
+RUN chmod +x /scripts/*.sh
+
 ADD . /root/go/src/github.com/starkandwayne/visualizeservices
 RUN cd /root/go/src/github.com/starkandwayne/visualizeservices; go get ./...
-
-ENTRYPOINT ["visualizeservices"]
