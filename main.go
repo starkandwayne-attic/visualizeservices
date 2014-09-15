@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	consulapi "github.com/armon/consul-api"
@@ -18,8 +19,12 @@ type ServerNodeServiceTally struct {
 var tally = make(map[string]*ServerNodeServiceTally)
 
 func main() {
-	var consulAddr = flag.String("consul-addr", "localhost:8500", "HTTP API for Consul agent/server")
+	var consulAddr = flag.String("consul-addr", "localhost:8500", "HTTP API for Consul agent/server (or $CONSUL_HTTP_ADDR)")
 	flag.Parse()
+	if os.Getenv("CONSUL_HTTP_ADDR") != "" {
+		env := os.Getenv("CONSUL_HTTP_ADDR")
+		consulAddr = &env
+	}
 
 	config := consulapi.Config{Address: *consulAddr, HttpClient: http.DefaultClient}
 	consul, _ := consulapi.NewClient(&config)
