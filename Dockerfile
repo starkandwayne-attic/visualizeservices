@@ -13,5 +13,3 @@ RUN chmod +x /bin/docker
 
 ADD . /root/go/src/github.com/starkandwayne/visualizeservices
 RUN cd /root/go/src/github.com/starkandwayne/visualizeservices; go get ./...
-
-ENTRYPOINT ["visualizeservices"]
