@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 
 	consulapi "github.com/armon/consul-api"
@@ -13,7 +14,7 @@ import (
 // ServerNodeServiceTally records the tally of services on a server node
 type ServerNodeServiceTally struct {
 	Address          string
-	ServiceCharCodes string
+	ServiceCharCodes []string
 }
 
 var tally = make(map[string]*ServerNodeServiceTally)
@@ -53,7 +54,12 @@ func main() {
 		}
 	}
 	for nodeName, nodeTally := range tally {
-		fmt.Printf("%s: %s\n", nodeName, nodeTally.ServiceCharCodes)
+		sort.Strings(nodeTally.ServiceCharCodes)
+		fmt.Printf("%s: ", nodeName)
+		for _, charCode := range nodeTally.ServiceCharCodes {
+			fmt.Print(charCode)
+		}
+		fmt.Println("")
 	}
 }
 
@@ -62,7 +68,7 @@ func appendServiceToServerNodes(nodeName string, serviceCharCode string) {
 		tally[nodeName] = &ServerNodeServiceTally{}
 	}
 	serverNode := tally[nodeName]
-	serverNode.ServiceCharCodes = serverNode.ServiceCharCodes + serviceCharCode
+	serverNode.ServiceCharCodes = append(serverNode.ServiceCharCodes, serviceCharCode)
 }
 
 func serviceCharCodeForServiceNode(service *consulapi.CatalogService) string {
