@@ -2,13 +2,13 @@ Visualization of services
 =========================
 
 ```
-Nodes Services
+Nodes   Services
 ----------------
-1.    Re
-2.    rne
-3.    Cem
-4.    cnM
-5.    rcnm
+node 1: Re
+node 2: rne
+node 3: Cem
+node 4: cnM
+node 5: rcnm
 ```
 
 In the example above, there is a Redis cluster (master `R` on node 1, slaves `r` on nodes 2 and 5), a Mongo cluster (primary `M` on node 4, secondaries on nodes 3 and 5), and so on (e.g. NATS is `n`, Elastic Search is `e`, Cassandra is `c`).
@@ -16,7 +16,7 @@ In the example above, there is a Redis cluster (master `R` on node 1, slaves `r`
 It is assumed that this application is run as a handler for a `consul watch` on any services changes:
 
 ```bash
-consul watch  -type=services visualizeservices
+consul watch -type=services visualizeservices
 ```
 
 The input data from `consul watch` is something similar to:
@@ -33,5 +33,12 @@ Run within boot2docker
 ```
 export DOCKER_IP=192.168.59.103
 docker build -t starkandwayne/visualizeservices .
-docker run starkandwayne/visualizeservices -consul-addr $DOCKER_IP:8500
+docker run -e "CONSUL_HTTP_ADDR=$DOCKER_IP:8500" starkandwayne/visualizeservices visualizeservices
+```
+
+Run watcher within boot2docker
+------------------------------
+
+```
+./bin/visualization_start.sh
 ```
