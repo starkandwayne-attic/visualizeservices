@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 
 	consulapi "github.com/armon/consul-api"
 )
 
 // ServerNodeServiceTally records the tally of services on a server node
 type ServerNodeServiceTally struct {
-	Address       string
-	ServicesCount int
+	Address          string
+	ServiceCharCodes string
 }
 
 var tally = make(map[string]*ServerNodeServiceTally)
@@ -46,23 +45,26 @@ func main() {
 			}
 
 			for _, service := range services {
-				appendServiceToServerNodes(service.Node)
+				appendServiceToServerNodes(service.Node, serviceCharCodeForService(service))
 				// fmt.Printf("%#v\n", *service)
 			}
 
 		}
 	}
 	for nodeName, nodeTally := range tally {
-		// mid-dot http://www.fileformat.info/info/unicode/char/b7/index.htm
-		dots := strings.Repeat("·", nodeTally.ServicesCount)
-		fmt.Printf("%s: %s\n", nodeName, dots)
+		fmt.Printf("%s: %s\n", nodeName, nodeTally.ServiceCharCodes)
 	}
 }
 
-func appendServiceToServerNodes(nodeName string) {
+func appendServiceToServerNodes(nodeName string, serviceCharCode string) {
 	if tally[nodeName] == nil {
 		tally[nodeName] = &ServerNodeServiceTally{}
 	}
 	serverNode := tally[nodeName]
-	serverNode.ServicesCount++
+	serverNode.ServiceCharCodes = serverNode.ServiceCharCodes + serviceCharCode
+}
+
+func serviceCharCodeForService(service *consulapi.CatalogService) string {
+	// mid-dot http://www.fileformat.info/info/unicode/char/b7/index.htm
+	return "·"
 }
