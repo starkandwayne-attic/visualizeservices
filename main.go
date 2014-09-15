@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	consulapi "github.com/armon/consul-api"
 )
@@ -45,7 +46,7 @@ func main() {
 			}
 
 			for _, service := range services {
-				appendServiceToServerNodes(service.Node, serviceCharCodeForService(service))
+				appendServiceToServerNodes(service.Node, serviceCharCodeForServiceNode(service))
 				// fmt.Printf("%#v\n", *service)
 			}
 
@@ -64,7 +65,23 @@ func appendServiceToServerNodes(nodeName string, serviceCharCode string) {
 	serverNode.ServiceCharCodes = serverNode.ServiceCharCodes + serviceCharCode
 }
 
-func serviceCharCodeForService(service *consulapi.CatalogService) string {
-	// mid-dot http://www.fileformat.info/info/unicode/char/b7/index.htm
-	return "·"
+func serviceCharCodeForServiceNode(service *consulapi.CatalogService) string {
+	// default character is the mid-dot http://www.fileformat.info/info/unicode/char/b7/index.htm
+	charCode := "·"
+	primaryNode := false
+
+	for _, tag := range service.ServiceTags {
+		if strings.HasPrefix(tag, "char-code-") {
+			charCode = strings.TrimPrefix(tag, "char-code-")
+		}
+		if tag == "master" || tag == "primary" {
+			primaryNode = true
+		}
+	}
+
+	if primaryNode {
+		charCode = strings.ToUpper(charCode)
+	}
+
+	return charCode
 }
