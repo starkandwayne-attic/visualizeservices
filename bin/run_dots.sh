@@ -3,6 +3,10 @@
 
 docker_image=starkandwayne/visualizeservices
 
+if [[ -f Dockerfile ]]; then
+  docker build -t ${docker_image} .
+fi
+
 host_ip=${DOCKER_IP:-192.168.59.103}
 consul_ip=${CONSUL_IP:-$host_ip}
 consul_port=${CONSUL_PORT:-8500}
@@ -13,4 +17,4 @@ docker run -v /var/run/docker.sock:/var/run/docker.sock \
   -e "CONSUL_HTTP_ADDR=${CONSUL_HTTP_ADDR}" \
   ${docker_image} \
     consul watch -http-addr=$CONSUL_HTTP_ADDR \
-      -type services visualizeservices
+      -type services visualizeservices dots

@@ -24,17 +24,23 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "visualizeservices"
 	app.Usage = "Visualize Consul services being advertised"
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:   "consul-addr, a",
-			Value:  "localhost:8500",
-			Usage:  "HTTP API for Consul agent/server",
-			EnvVar: "CONSUL_HTTP_ADDR",
+	app.Commands = []cli.Command{
+		{
+			Name:  "dots",
+			Usage: "Visualize using dots or characters per service node",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:   "consul-addr, a",
+					Value:  "localhost:8500",
+					Usage:  "HTTP API for Consul agent/server",
+					EnvVar: "CONSUL_HTTP_ADDR",
+				},
+			},
+			Action: func(c *cli.Context) {
+				consulAddr = c.String("consul-addr")
+				showDotVisualization()
+			},
 		},
-	}
-	app.Action = func(c *cli.Context) {
-		consulAddr = c.String("consul-addr")
-		showDotVisualization()
 	}
 	app.Run(os.Args)
 
