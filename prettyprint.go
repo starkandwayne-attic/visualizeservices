@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/armon/consul-api"
 )
 
-func showPrettyVisualization() {
+func showPrettyVisualization(filterNamePrefix, filterTag string) {
 	config := consulapi.Config{Address: consulAddr, HttpClient: http.DefaultClient}
 	consul, _ := consulapi.NewClient(&config)
 	query := consulapi.QueryOptions{}
@@ -18,7 +19,22 @@ func showPrettyVisualization() {
 		fmt.Println(err)
 		return
 	}
-	for catalogService, _ := range catalogServices {
+	for catalogService, serviceTags := range catalogServices {
+		skipService := strings.HasPrefix(catalogService, filterNamePrefix)
+		if skipService {
+			continue
+		}
+
+		for _, tag := range serviceTags {
+			if tag == filterTag {
+				skipService = true
+				break
+			}
+		}
+		if skipService {
+			continue
+		}
+
 		fmt.Printf("%s:\n", catalogService)
 
 		services, _, err := catalog.Service(catalogService, "", &query)

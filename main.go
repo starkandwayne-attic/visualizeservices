@@ -48,10 +48,20 @@ func main() {
 					Usage:  "HTTP API for Consul agent/server",
 					EnvVar: "CONSUL_HTTP_ADDR",
 				},
+				cli.StringFlag{
+					Name:  "filter-name-prefix, n",
+					Value: "",
+					Usage: "Filter out services that commence with a prefix",
+				},
+				cli.StringFlag{
+					Name:  "filter-tag, t",
+					Value: "",
+					Usage: "Filter out services that include specific tag",
+				},
 			},
 			Action: func(c *cli.Context) {
 				consulAddr = c.String("consul-addr")
-				showPrettyVisualization()
+				showPrettyVisualization(c.String("filter-name-prefix"), c.String("filter-tag"))
 			},
 		},
 	}
