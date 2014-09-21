@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -9,6 +8,7 @@ import (
 	"strings"
 
 	consulapi "github.com/armon/consul-api"
+	"github.com/codegangsta/cli"
 )
 
 // ServerNodeServiceTally records the tally of services on a server node
@@ -18,16 +18,30 @@ type ServerNodeServiceTally struct {
 }
 
 var tally = make(map[string]*ServerNodeServiceTally)
+var consulAddr = "localhost:8500"
 
 func main() {
-	var consulAddr = flag.String("consul-addr", "localhost:8500", "HTTP API for Consul agent/server (or $CONSUL_HTTP_ADDR)")
-	flag.Parse()
-	if os.Getenv("CONSUL_HTTP_ADDR") != "" {
-		env := os.Getenv("CONSUL_HTTP_ADDR")
-		consulAddr = &env
+	app := cli.NewApp()
+	app.Name = "visualizeservices"
+	app.Usage = "Visualize Consul services being advertised"
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:   "consul-addr, a",
+			Value:  "localhost:8500",
+			Usage:  "HTTP API for Consul agent/server",
+			EnvVar: "CONSUL_HTTP_ADDR",
+		},
 	}
+	app.Action = func(c *cli.Context) {
+		consulAddr = c.String("consul-addr")
+		showDotVisualization()
+	}
+	app.Run(os.Args)
 
-	config := consulapi.Config{Address: *consulAddr, HttpClient: http.DefaultClient}
+}
+
+func showDotVisualization() {
+	config := consulapi.Config{Address: consulAddr, HttpClient: http.DefaultClient}
 	consul, _ := consulapi.NewClient(&config)
 	query := consulapi.QueryOptions{}
 	catalog := consul.Catalog()
