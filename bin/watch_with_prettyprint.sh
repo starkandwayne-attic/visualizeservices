@@ -12,4 +12,4 @@ docker run -v /var/run/docker.sock:/var/run/docker.sock \
   -e "CONSUL_HTTP_ADDR=${CONSUL_HTTP_ADDR}" \
   ${docker_image} \
     consul watch -http-addr=$CONSUL_HTTP_ADDR \
-      -type services visualizeservices pretty -n consul
+      -type services visualizeservices pretty -n consul $@
