@@ -43,7 +43,7 @@ func showPrettyVisualization(filterNamePrefix, filterTag string) {
 			return
 		}
 		for _, service := range services {
-			fmt.Printf("  %v\n", *service)
+			fmt.Printf("  %s:%d - %v\n", service.Node, service.ServicePort, service.ServiceTags)
 		}
 	}
 
