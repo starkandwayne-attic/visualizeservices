@@ -69,16 +69,22 @@ func showDotVisualization() {
 	}
 	// TODO: sort tally by nodeName
 	orderedNodeNames := []string{}
+	maxNodeNameSize := 0
 	for nodeName := range tally {
 		orderedNodeNames = append(orderedNodeNames, nodeName)
+		if len(nodeName) > maxNodeNameSize {
+			maxNodeNameSize = len(nodeName)
+		}
 	}
 	sort.Strings(orderedNodeNames)
+	nodeNameFormatter := fmt.Sprintf("%%%ds: ", maxNodeNameSize)
 
 	// TODO: fixed-width for displaying nodeName: so all .... are aligned
 	for _, nodeName := range orderedNodeNames {
+		fmt.Printf(nodeNameFormatter, nodeName)
+
 		nodeTally := tally[nodeName]
 		sort.Strings(nodeTally.ServiceCharCodes)
-		fmt.Printf("%s: ", nodeName)
 		for _, charCode := range nodeTally.ServiceCharCodes {
 			fmt.Print(charCode)
 		}
